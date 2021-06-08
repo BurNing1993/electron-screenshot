@@ -1,0 +1,24 @@
+{
+  "name": "electron-screenshot",
+  "version": "1.0.0",
+  "description": "electron-screenshot",
+  "main": "app/main/index.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BurNing1993/electron-screenshot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/BurNing1993/electron-screenshot/issues"
+  },
+  "homepage": "https://github.com/BurNing1993/electron-screenshot#readme",
+  "devDependencies": {
+    "electron": "^13.1.1"
+  }
+}
