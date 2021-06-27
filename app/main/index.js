@@ -1,11 +1,15 @@
 const { app, Menu } = require('electron')
-const { create: createWindow } = require('./window')
+const { create: createMainWindow } = require('./windows/main')
+const { create: createCaptureWindow } = require('./windows/capture')
+const handleIpc = require('./ipc')
 
 app.whenReady().then(() => {
-  createWindow()
-  Menu.setApplicationMenu(null)
+  createMainWindow()
+  handleIpc()
+  createCaptureWindow()
+  // Menu.setApplicationMenu(null)
   app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+    if (BrowserWindow.getAllWindows().length === 0) createMainWindow()
   })
 })
 
