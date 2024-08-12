@@ -10,11 +10,17 @@ interface ImportMeta {
   readonly env: ImportMetaEnv
 }
 
+type RecorderStatus = 'start' | 'stop'
+
 interface ScreenshotConfig {
   clipboard: boolean
   pin: boolean
   save: boolean
   savePath: string
+}
+
+interface RecorderConfig {
+  systemAudio: boolean
 }
 
 type AppPathName =
@@ -48,17 +54,28 @@ interface IElectronAPI {
   ) => Promise<Electron.OpenDialogReturnValue>
   getPath: (name: AppPathName) => Promise<string>
   screenshot: (config: ScreenshotConfig) => Promise<void>
+  startRecorder: (config: RecorderConfig) => Promise<void>
+  stopRecorder: () => Promise<void>
+  // other
+  // sendToMain: (channel: string, ...args: any[]) => Promise<void>
   // screenshot
   closeScreenshot: () => Promise<void>
   saveScreenshot: (arrayBuffer: ArrayBuffer) => Promise<void>
   pinScreenshot: (arrayBuffer: ArrayBuffer) => Promise<void>
   // pin
   setPinWindowSize: (id: number, width: number, height: number) => Promise<void>
+  // video
+  saveVideo: (arrayBuffer: ArrayBuffer) => Promise<void>
+  recorderStarted: () => Promise<void>
 }
 
 type RemoveListener = () => void
 
 interface MessageAPI {
+  // main
+  onRecorderStatusChange: (
+    callback: (status: RecorderStatus) => void
+  ) => RemoveListener
   // common
   onThemeChange: (
     callback: (theme: Electron.NativeTheme['themeSource']) => void
@@ -67,6 +84,9 @@ interface MessageAPI {
   onPin: (callback: (url: string, id: number) => void) => RemoveListener
   // screenshot
   onScreenshot: (callback: (thumbnailURL: string) => void) => RemoveListener
+  // recorder
+  onStartRecorder: (callback: () => void) => RemoveListener
+  onStopRecorder: (callback: () => void) => RemoveListener
 }
 
 interface Argv {

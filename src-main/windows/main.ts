@@ -53,7 +53,7 @@ export function focus() {
   }
 }
 
-export function send(channel: string, ...args: unknown[]) {
+export function sendToMain(channel: string, ...args: unknown[]) {
   win.webContents.send(channel, ...args)
 }
 
@@ -67,7 +67,7 @@ export function setMainTitleBarOverlay() {
 }
 
 export function mainNavigate(to: string) {
-  send('NAVIGATE', to)
+  sendToMain('NAVIGATE', to)
 }
 
 export function beforeQuit() {

@@ -11,6 +11,8 @@ import {
 } from './windows/main'
 import handleIPC from './ipc'
 import './menu'
+import { beforeScreenshotQuit } from './windows/screenshot'
+import { beforeRecorderQuit } from './windows/recorder'
 
 log.initialize()
 
@@ -49,6 +51,8 @@ app.on('activate', () => {
 
 app.on('before-quit', () => {
   beforeQuit()
+  beforeScreenshotQuit()
+  beforeRecorderQuit()
 })
 
 // 日志文件设置

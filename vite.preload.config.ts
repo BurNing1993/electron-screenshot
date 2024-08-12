@@ -27,6 +27,7 @@ export default defineConfig(({ mode }) => {
           preload: path.join(ROOT, '/src-main/preload/main.ts'),
           'screenshot-preload': path.join(ROOT, '/src-main/preload/screenshot.ts'),
           'pin-preload': path.join(ROOT, '/src-main/preload/pin.ts'),
+          'recorder-preload': path.join(ROOT, '/src-main/preload/recorder.ts'),
         },
         output: {
           format: 'cjs',

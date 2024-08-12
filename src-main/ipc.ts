@@ -1,14 +1,35 @@
 import fsp from 'node:fs/promises'
 import path from 'node:path'
-import { app, dialog, ipcMain, nativeTheme } from 'electron/main'
+import { app, dialog, ipcMain, nativeTheme, Notification } from 'electron/main'
 import { clipboard, nativeImage, shell } from 'electron/common'
 import { checkForUpdates } from './updater'
-import { AppPathName, ScreenshotConfig, UpdateType } from './types'
-import { hideMainWidow, setMainTitleBarOverlay } from './windows/main'
+import {
+  AppPathName,
+  RecorderConfig,
+  ScreenshotConfig,
+  UpdateType,
+} from './types'
+import {
+  hideMainWidow,
+  sendToMain,
+  setMainTitleBarOverlay,
+} from './windows/main'
 import { closeScreenshot, takeScreenshot } from './windows/screenshot'
 import { createPinWindow, setPinWindowSize } from './windows/pin'
+import { startRecorder, stopRecorder } from './windows/recorder'
+import { setNormalTray, setStopRecordTray } from './menu'
+import { successIcon } from './icons'
 
 let screenshotConfig: ScreenshotConfig = null!
+let notification: Notification = null!
+
+function dateFileName() {
+  return new Date()
+    .toLocaleString('zh-CN')
+    .replace(/\//g, '')
+    .replace(/:/g, '')
+    .replace(' ', '_')
+}
 
 export default function handleIPC() {
   ipcMain.handle('TOGGLE_DEVTOOLS', (event) => {
@@ -57,6 +78,10 @@ export default function handleIPC() {
     takeScreenshot()
   })
 
+  ipcMain.handle('CLOSE_SCREENSHOT', () => {
+    closeScreenshot()
+  })
+
   ipcMain.handle('SAVE_SCREENSHOT', async (_e, arrayBuffer: ArrayBuffer) => {
     closeScreenshot()
     const buffer = Buffer.from(arrayBuffer)
@@ -73,11 +98,7 @@ export default function handleIPC() {
       await fsp.writeFile(
         path.join(
           screenshotConfig.savePath,
-          `screenshot_${new Date()
-            .toLocaleString('zh-CN')
-            .replace(/\//g, '')
-            .replace(/:/g, '')
-            .replace(' ', '-')}.png`
+          `screenshot_${dateFileName()}.png`
         ),
         buffer
       )
@@ -90,4 +111,47 @@ export default function handleIPC() {
       setPinWindowSize(id, width, height)
     }
   )
+
+  ipcMain.handle('START_RECORD', (_e, config: RecorderConfig) => {
+    startRecorder(config)
+  })
+
+  ipcMain.handle('STOP_RECORD', (_e) => {
+    stopRecorder()
+  })
+
+  ipcMain.handle('SAVE_VIDEO', (_e, arrayBuffer: ArrayBuffer) => {
+    console.log('SAVE_VIDEO')
+    setNormalTray()
+    const buffer = Buffer.from(arrayBuffer)
+    const videoPath = path.join(
+      app.getPath('downloads'),
+      `video_record_${dateFileName()}.mp4`
+    )
+    return fsp
+      .writeFile(videoPath, buffer)
+      .then(() => {
+        notification = new Notification({
+          title: '视频录制完成',
+          body: `保存路径为：${videoPath}`,
+          icon: successIcon,
+        })
+        notification.show()
+        notification.on('click', () => {
+          shell.openPath(videoPath)
+        })
+      })
+      .finally(() => {
+        sendToMain('RECORDER_STATUS_CHANGE', 'stop')
+      })
+  })
+
+  // ipcMain.handle('SEND_TO_MAIN', (_e, channel: string, ...args: any[]) => {
+  //   sendToMain(channel, ...args)
+  // })
+
+  ipcMain.handle('RECORDER_STARTED', () => {
+    sendToMain('RECORDER_STATUS_CHANGE', 'start')
+    setStopRecordTray()
+  })
 }

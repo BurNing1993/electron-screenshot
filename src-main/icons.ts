@@ -4,6 +4,9 @@ import appImg from './assets/app.png'
 import appleIconImg from './assets/appleIcon.png'
 import logoutImg from './assets/logout.png'
 import iconImg from './assets/icon192.png'
+import appleStop from './assets/appleStop.png'
+import stop from './assets/stop.png'
+import success from './assets/success.png'
 
 /**
  * @see https://cn.vitejs.dev/config/build-options.html#build-assetsinlinelimit
@@ -21,6 +24,15 @@ export const icon = nativeImage.createFromDataURL(iconImg)
 
 export const appIcon = process.platform === 'darwin' ? appleIcon : winIcon
 
+const appleStopIcon = nativeImage.createFromDataURL(appleStop)
+
+const stopIcon = nativeImage.createFromDataURL(stop)
+
+export const appStopIcon =
+  process.platform === 'darwin' ? appleStopIcon : stopIcon
+
 export const trayAppIcon = nativeImage.createFromDataURL(appImg)
 
 export const logoutIcon = nativeImage.createFromDataURL(logoutImg)
+
+export const successIcon = nativeImage.createFromDataURL(success)

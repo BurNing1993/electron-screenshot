@@ -3,7 +3,7 @@ import { BrowserWindow, desktopCapturer, screen } from 'electron/main'
 import { ROOT } from '../constant'
 
 let win: BrowserWindow = null!
-const quit = false
+let quit = false
 
 export function createScreenshotWindow() {
   const primaryDisplay = screen.getPrimaryDisplay()
@@ -82,4 +82,8 @@ export function takeScreenshot() {
 
 export function closeScreenshot() {
   win.hide()
+}
+
+export function beforeScreenshotQuit() {
+  quit = true
 }

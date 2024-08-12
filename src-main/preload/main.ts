@@ -1,6 +1,12 @@
 import { contextBridge, ipcRenderer } from 'electron/renderer'
 import { version } from '../../package.json'
-import type { AppPathName, Theme, ScreenshotConfig } from '../types'
+import type {
+  AppPathName,
+  Theme,
+  ScreenshotConfig,
+  RecorderConfig,
+  RecorderStatus,
+} from '../types'
 
 /**
  * Sandboxed preload scripts can't use ESM imports
@@ -21,6 +27,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('OPEN_DIALOG', options),
   screenshot: (config: ScreenshotConfig) =>
     ipcRenderer.invoke('SCREENSHOT', config),
+  startRecorder: (config: RecorderConfig) =>
+    ipcRenderer.invoke('START_RECORD', config),
+  stopRecorder: () => ipcRenderer.invoke('STOP_RECORD'),
   getPath: (name: AppPathName) => ipcRenderer.invoke('GET_PATH', name),
 })
 
@@ -33,8 +42,8 @@ function addListener(channel: string, callback: (...args: any[]) => void) {
 
 // main -> renderer
 contextBridge.exposeInMainWorld('messageAPI', {
-  onNavigate: (callback: (to: string) => void) =>
-    addListener('NAVIGATE', callback),
+  onRecorderStatusChange: (callback: (status: RecorderStatus) => void) =>
+    addListener('RECORDER_STATUS_CHANGE', callback),
 })
 
 contextBridge.exposeInMainWorld('argv', {

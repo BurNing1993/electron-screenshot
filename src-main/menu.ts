@@ -1,8 +1,9 @@
 import { Menu, app, Tray, dialog } from 'electron'
 import { APP_NAME } from './constant'
-import { appIcon, logoutIcon, icon, trayAppIcon } from './icons'
+import { appIcon, logoutIcon, icon, trayAppIcon, appStopIcon } from './icons'
 import { focus } from './windows/main'
 import { version } from '../package.json'
+import { stopRecorder } from './windows/recorder'
 
 function about() {
   dialog.showMessageBox({
@@ -87,3 +88,15 @@ app.whenReady().then(() => {
   tray.setContextMenu(contextMenu)
   tray.on('click', focus)
 })
+
+export function setStopRecordTray() {
+  tray.setImage(appStopIcon)
+  tray.once('click', () => {
+    stopRecorder()
+    tray.setImage(appIcon)
+  })
+}
+
+export function setNormalTray() {
+  tray.setImage(appIcon)
+}
