@@ -1,24 +1,57 @@
 {
   "name": "electron-screenshot",
-  "version": "1.0.0",
-  "description": "electron-screenshot",
-  "main": "app/main/index.js",
-  "scripts": {
-    "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/BurNing1993/electron-screenshot.git"
-  },
-  "keywords": [],
-  "author": "",
+  "version": "0.0.1",
+  "private": true,
+  "description": "pin",
+  "main": "dist/main.mjs",
+  "type": "module",
+  "keywords": [
+    "electron"
+  ],
+  "author": "Joey",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/BurNing1993/electron-screenshot/issues"
+  "engines": {
+    "node": ">=18"
   },
-  "homepage": "https://github.com/BurNing1993/electron-screenshot#readme",
+  "scripts": {
+    "publish": "npm run build && electron-builder build -c electron-builder.config.cjs -p always",
+    "package": "npm run build && electron-builder build -c electron-builder.config.cjs",
+    "dev": "node scripts/dev.mjs",
+    "dev:renderer": "vite -c vite.config.ts",
+    "build": "vite build -c vite.preload.config.ts && vite build -c vite.main.config.ts && vite build -c vite.config.ts",
+    "prebuild": "npm run check",
+    "check": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.json",
+    "test": "vitest",
+    "lint": "eslint src --ext .ts,.tsx && eslint src-main --ext .ts",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "electron-log": "^5.1.7",
+    "electron-updater": "^6.2.1",
+    "lucide-react": "^0.427.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^2.5.0",
+    "tailwindcss-animate": "^1.0.7"
+  },
   "devDependencies": {
-    "electron": "^13.1.1"
+    "@types/node": "^22.2.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.1",
+    "@typescript-eslint/parser": "^8.0.1",
+    "@vitejs/plugin-react-swc": "^3.7.0",
+    "autoprefixer": "^10.4.20",
+    "electron": "^31.3.1",
+    "electron-builder": "^24.13.3",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "postcss": "^8.4.41",
+    "tailwindcss": "^3.4.9",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.0",
+    "vitest": "^2.0.5"
   }
 }
