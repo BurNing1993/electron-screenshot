@@ -25,6 +25,8 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         input: {
           preload: path.join(ROOT, '/src-main/preload/main.ts'),
+          'screenshot-preload': path.join(ROOT, '/src-main/preload/screenshot.ts'),
+          'pin-preload': path.join(ROOT, '/src-main/preload/pin.ts'),
         },
         output: {
           format: 'cjs',

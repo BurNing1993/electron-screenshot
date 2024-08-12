@@ -10,6 +10,31 @@ interface ImportMeta {
   readonly env: ImportMetaEnv
 }
 
+interface ScreenshotConfig {
+  clipboard: boolean
+  pin: boolean
+  save: boolean
+  savePath: string
+}
+
+type AppPathName =
+  | 'home'
+  | 'appData'
+  | 'userData'
+  | 'sessionData'
+  | 'temp'
+  | 'exe'
+  | 'module'
+  | 'desktop'
+  | 'documents'
+  | 'downloads'
+  | 'music'
+  | 'pictures'
+  | 'videos'
+  | 'recent'
+  | 'logs'
+  | 'crashDumps'
+
 interface IElectronAPI {
   // main
   toggleDevtools: () => Promise<void>
@@ -21,29 +46,27 @@ interface IElectronAPI {
   showOpenDialog: (
     options: Electron.OpenDialogOptions
   ) => Promise<Electron.OpenDialogReturnValue>
-  pin: (payload: PinPayload) => Promise<void>
-  screenshot: () => Promise<void>
-  createPin: (type: CreatePinType) => Promise<void>
+  getPath: (name: AppPathName) => Promise<string>
+  screenshot: (config: ScreenshotConfig) => Promise<void>
   // screenshot
   closeScreenshot: () => Promise<void>
   saveScreenshot: (arrayBuffer: ArrayBuffer) => Promise<void>
   pinScreenshot: (arrayBuffer: ArrayBuffer) => Promise<void>
-  // editor
+  // pin
+  setPinWindowSize: (id: number, width: number, height: number) => Promise<void>
 }
 
 type RemoveListener = () => void
 
 interface MessageAPI {
-  // main
-  // pin
-  onPin: (callback: (payload: PinPayload) => void) => RemoveListener
+  // common
   onThemeChange: (
     callback: (theme: Electron.NativeTheme['themeSource']) => void
   ) => RemoveListener
+  // pin
+  onPin: (callback: (url: string, id: number) => void) => RemoveListener
   // screenshot
   onScreenshot: (callback: (thumbnailURL: string) => void) => RemoveListener
-  // editor
-  onCreatePin: (callback: (type: CreatePinType) => void) => RemoveListener
 }
 
 interface Argv {

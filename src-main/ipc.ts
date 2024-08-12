@@ -1,8 +1,14 @@
-import { dialog, ipcMain, nativeTheme } from 'electron/main'
-import { shell } from 'electron/common'
+import fsp from 'node:fs/promises'
+import path from 'node:path'
+import { app, dialog, ipcMain, nativeTheme } from 'electron/main'
+import { clipboard, nativeImage, shell } from 'electron/common'
 import { checkForUpdates } from './updater'
-import { UpdateType } from './types'
-import { setMainTitleBarOverlay } from './windows/main'
+import { AppPathName, ScreenshotConfig, UpdateType } from './types'
+import { hideMainWidow, setMainTitleBarOverlay } from './windows/main'
+import { closeScreenshot, takeScreenshot } from './windows/screenshot'
+import { createPinWindow, setPinWindowSize } from './windows/pin'
+
+let screenshotConfig: ScreenshotConfig = null!
 
 export default function handleIPC() {
   ipcMain.handle('TOGGLE_DEVTOOLS', (event) => {
@@ -40,4 +46,48 @@ export default function handleIPC() {
   ipcMain.handle('OPEN_DIALOG', (_e, options: Electron.OpenDialogOptions) => {
     return dialog.showOpenDialog(options)
   })
+
+  ipcMain.handle('GET_PATH', (_e, name: AppPathName) => {
+    return app.getPath(name)
+  })
+
+  ipcMain.handle('SCREENSHOT', (_e, config: ScreenshotConfig) => {
+    screenshotConfig = config
+    hideMainWidow()
+    takeScreenshot()
+  })
+
+  ipcMain.handle('SAVE_SCREENSHOT', async (_e, arrayBuffer: ArrayBuffer) => {
+    closeScreenshot()
+    const buffer = Buffer.from(arrayBuffer)
+    if (screenshotConfig.pin) {
+      const url = `data:image/jpeg;base64,${Buffer.from(arrayBuffer).toString(
+        'base64'
+      )}`
+      createPinWindow(url)
+    }
+    if (screenshotConfig.clipboard) {
+      clipboard.writeImage(nativeImage.createFromBuffer(buffer))
+    }
+    if (screenshotConfig.save) {
+      await fsp.writeFile(
+        path.join(
+          screenshotConfig.savePath,
+          `screenshot_${new Date()
+            .toLocaleString('zh-CN')
+            .replace(/\//g, '')
+            .replace(/:/g, '')
+            .replace(' ', '-')}.png`
+        ),
+        buffer
+      )
+    }
+  })
+
+  ipcMain.handle(
+    'SET_PIN_WINDOW_SIZE',
+    (_e, id: number, width: number, height: number) => {
+      setPinWindowSize(id, width, height)
+    }
+  )
 }

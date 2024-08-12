@@ -67,3 +67,75 @@
     @apply bg-background text-foreground;
   }
 }
+
+:root {
+  --fallback-title-bar-height: 40px;
+}
+
+.draggable {
+  -webkit-app-region: drag;
+}
+
+.nonDraggable {
+  -webkit-app-region: no-drag;
+}
+
+.titleBarContainer {
+  position: fixed;
+  top: env(titlebar-area-y, 0);
+  height: env(titlebar-area-height, var(--fallback-title-bar-height));
+  width: 100%;
+  cursor: pointer;
+  z-index: 9;
+  box-sizing: content-box;
+}
+
+.titleBar {
+  position: absolute;
+  top: 0;
+  display: flex;
+  height: 100%;
+  left: env(titlebar-area-x, 0);
+  width: env(titlebar-area-width, 100%);
+  text-align: center;
+}
+
+.titleBar-left {
+  left: env(titlebar-area-x, 0);
+}
+
+#logo {
+  width: calc(11rem - env(titlebar-area-x, 0));
+}
+
+.titleBar-top {
+  top: env(titlebar-area-height, var(--fallback-title-bar-height));
+}
+.titleBar-width {
+  width: env(titlebar-area-width, 100%);
+}
+
+#main {
+  height: calc(
+    100vh - env(titlebar-area-height, var(--fallback-title-bar-height))
+  );
+  margin-top: env(titlebar-area-height, var(--fallback-title-bar-height));
+  overflow: hidden;
+}
+
+#content {
+  @apply h-full overflow-auto;
+}
+
+.titleBar-ml {
+  margin-left: env(titlebar-area-x, 0);
+}
+.titleBar-mr {
+  margin-right: env(titlebar-area-x, 0);
+}
+
+a,
+button,
+input {
+  @apply focus-within:outline-none;
+}

@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron/renderer'
 import { version } from '../../package.json'
-import type { CreatePinType, PinPayload, Theme } from '../types'
+import type { AppPathName, Theme, ScreenshotConfig } from '../types'
 
 /**
  * Sandboxed preload scripts can't use ESM imports
@@ -19,10 +19,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
   openPath: (fullPath: string) => ipcRenderer.invoke('OPEN_PATH', fullPath),
   showOpenDialog: (options: Electron.OpenDialogOptions) =>
     ipcRenderer.invoke('OPEN_DIALOG', options),
-  pin: (payload: PinPayload) => ipcRenderer.invoke('PIN', payload),
-  createPin: (type: CreatePinType) => ipcRenderer.invoke('CREATE_PIN', type),
-  // screenshot
-  screenshot: () => ipcRenderer.invoke('SCREENSHOT'),
+  screenshot: (config: ScreenshotConfig) =>
+    ipcRenderer.invoke('SCREENSHOT', config),
+  getPath: (name: AppPathName) => ipcRenderer.invoke('GET_PATH', name),
 })
 
 function addListener(channel: string, callback: (...args: any[]) => void) {
