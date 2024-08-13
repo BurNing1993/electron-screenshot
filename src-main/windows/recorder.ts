@@ -1,12 +1,33 @@
+import fsp from 'node:fs/promises'
 import path from 'node:path'
-import { BrowserWindow, desktopCapturer, screen, session } from 'electron/main'
+import {
+  app,
+  BrowserWindow,
+  desktopCapturer,
+  ipcMain,
+  screen,
+  session,
+  Notification,
+} from 'electron/main'
 import { ROOT } from '../constant'
 import type { RecorderConfig } from '../types'
+import { setNormalTray, setStopRecordTray } from '../menu'
+import { dateFileName } from '../utils'
+import { shell } from 'electron/common'
+import { sendToMain } from './main'
+import { successIcon } from '../icons'
 
 let win: BrowserWindow = null!
 let quit = false
+let recorderConfig: RecorderConfig = {
+  systemAudio: false,
+  delay: 0,
+  savePath: '',
+  ext: 'mp4',
+}
+let notification: Notification = null!
 
-export function createRecorderWindow(config: RecorderConfig) {
+export function createRecorderWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize
   win = new BrowserWindow({
     width,
@@ -20,7 +41,7 @@ export function createRecorderWindow(config: RecorderConfig) {
   })
 
   win.once('ready-to-show', () => {
-    startRecorder(config)
+    startRecorder()
     if (import.meta.env.DEV || process.argv.includes('--dev')) {
       win.webContents.openDevTools({ mode: 'bottom' })
     }
@@ -40,9 +61,9 @@ export function createRecorderWindow(config: RecorderConfig) {
   }
 }
 
-export function startRecorder(config: RecorderConfig) {
+export function startRecorder() {
   if (win === null) {
-    createRecorderWindow(config)
+    createRecorderWindow()
     return
   }
   if (import.meta.env.DEV) {
@@ -65,7 +86,7 @@ export function startRecorder(config: RecorderConfig) {
       }
     })
     .then((source) => {
-      const audio = config.systemAudio ? 'loopback' : 'loopbackWithMute'
+      const audio = recorderConfig.systemAudio ? 'loopback' : 'loopbackWithMute'
       session.defaultSession.setDisplayMediaRequestHandler(
         (_request, callback) => {
           callback({
@@ -92,3 +113,47 @@ export function stopRecorder() {
   closeRecorder()
   win.webContents.send('ON_STOP_RECORDER')
 }
+
+/**
+ * IPC
+ */
+app.whenReady().then(() => {
+  ipcMain.handle('UPDATE_RECORDER_CONFIG', (_e, config: RecorderConfig) => {
+    recorderConfig = config
+  })
+
+  ipcMain.handle('START_RECORD', startRecorder)
+
+  ipcMain.handle('STOP_RECORD', stopRecorder)
+
+  ipcMain.handle('SAVE_VIDEO', (_e, arrayBuffer: ArrayBuffer) => {
+    console.log('SAVE_VIDEO')
+    setNormalTray()
+    const buffer = Buffer.from(arrayBuffer)
+    const videoPath = path.join(
+      recorderConfig.savePath,
+      `video_record_${dateFileName()}.mp4`
+    )
+    return fsp
+      .writeFile(videoPath, buffer)
+      .then(() => {
+        notification = new Notification({
+          title: '视频录制完成',
+          body: `保存路径为：${videoPath}`,
+          icon: successIcon,
+        })
+        notification.show()
+        notification.on('click', () => {
+          shell.openPath(videoPath)
+        })
+      })
+      .finally(() => {
+        sendToMain('RECORDER_STATUS_CHANGE', 'stop')
+      })
+  })
+
+  ipcMain.handle('RECORDER_STARTED', () => {
+    sendToMain('RECORDER_STATUS_CHANGE', 'start')
+    setStopRecordTray()
+  })
+})

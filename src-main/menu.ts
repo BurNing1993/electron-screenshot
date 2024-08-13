@@ -1,24 +1,33 @@
 import { Menu, app, Tray, dialog } from 'electron'
 import { APP_NAME } from './constant'
-import { appIcon, logoutIcon, icon, trayAppIcon, appStopIcon } from './icons'
+import {
+  appIcon,
+  logoutIcon,
+  icon,
+  trayAppIcon,
+  appStopIcon,
+  recorderIcon,
+  aboutIcon,
+} from './icons'
 import { focus } from './windows/main'
 import { version } from '../package.json'
-import { stopRecorder } from './windows/recorder'
+import { startRecorder, stopRecorder } from './windows/recorder'
+import { takeScreenshot } from './windows/screenshot'
 
 function about() {
   dialog.showMessageBox({
     icon: icon,
     type: 'info',
-    title: '关于' + APP_NAME,
-    message: `
-    ${APP_NAME}\n
-    v${version}\n
-    node: ${process.versions.node}\n
-    chrome: ${process.versions.chrome}\n
-    electron: ${process.versions.electron}\n
-    platform: ${process.platform}\n
-    v8: ${process.versions.v8}\n`,
+    title: APP_NAME,
+    message: APP_NAME,
+    detail: `版本: v${version}node: ${process.versions.node}\nchrome: ${process.versions.chrome}\nelectron: ${process.versions.electron}\nplatform: ${process.platform}\nv8: ${process.versions.v8}\n`,
+    // buttons: ['检查更新', '关闭'],
   })
+  // .then((res) => {
+  //   if (res.response === 0) {
+  //     checkForUpdates('hint')
+  //   }
+  // })
 }
 
 if (process.platform === 'darwin') {
@@ -63,10 +72,18 @@ if (process.platform === 'darwin') {
     },
   ])
 
-  // const dockMenu = Menu.buildFromTemplate([])
+  const dockMenu = Menu.buildFromTemplate([
+    {
+      id: 'screenshot',
+      label: '截图',
+      icon: trayAppIcon,
+      click: takeScreenshot,
+    },
+    { id: 'record', label: '录屏', icon: recorderIcon, click: startRecorder },
+  ])
   Menu.setApplicationMenu(menu)
   app.whenReady().then(() => {
-    // app.dock.setMenu(dockMenu)
+    app.dock.setMenu(dockMenu)
   })
 } else {
   Menu.setApplicationMenu(null)
@@ -81,7 +98,16 @@ app.whenReady().then(() => {
   tray = new Tray(appIcon)
   tray.setToolTip(APP_NAME)
   const contextMenu = Menu.buildFromTemplate([
-    { id: 'music', label: APP_NAME, icon: trayAppIcon, click: focus },
+    { id: 'app', label: APP_NAME, icon: trayAppIcon, click: focus },
+    {
+      id: 'screenshot',
+      label: '截图',
+      icon: trayAppIcon,
+      click: takeScreenshot,
+    },
+    { id: 'record', label: '录屏', icon: recorderIcon, click: startRecorder },
+    { type: 'separator' },
+    { id: 'about', label: '关于', icon: aboutIcon, click: about },
     { type: 'separator' },
     { label: '退出', icon: logoutIcon, role: 'quit' },
   ])

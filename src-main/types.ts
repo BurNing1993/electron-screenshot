@@ -13,6 +13,9 @@ export interface ScreenshotConfig {
 
 export interface RecorderConfig {
   systemAudio: boolean
+  delay: number
+  savePath: string
+  ext: 'mp4' | 'gif'
 }
 
 export type AppPathName =

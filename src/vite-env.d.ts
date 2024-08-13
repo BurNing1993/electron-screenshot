@@ -21,6 +21,9 @@ interface ScreenshotConfig {
 
 interface RecorderConfig {
   systemAudio: boolean
+  delay: number
+  savePath: string
+  ext: 'mp4' | 'gif'
 }
 
 type AppPathName =
@@ -54,8 +57,10 @@ interface IElectronAPI {
   ) => Promise<Electron.OpenDialogReturnValue>
   getPath: (name: AppPathName) => Promise<string>
   screenshot: (config: ScreenshotConfig) => Promise<void>
+  updateScreenshotConfig: (config: ScreenshotConfig) => Promise<void>
   startRecorder: (config: RecorderConfig) => Promise<void>
   stopRecorder: () => Promise<void>
+  updateRecorderConfig: (config: RecorderConfig) => Promise<void>
   // other
   // sendToMain: (channel: string, ...args: any[]) => Promise<void>
   // screenshot

@@ -1,5 +1,5 @@
 import * as path from 'node:path'
-import { app, BrowserWindow, nativeTheme, screen } from 'electron/main'
+import { app, BrowserWindow, ipcMain, nativeTheme, screen } from 'electron/main'
 import { DARK_BACK_COLOR, ROOT } from '../constant'
 
 let screenWidth = 1920
@@ -71,3 +71,12 @@ export function setPinWindowSize(id: number, width: number, height: number) {
     }
   }
 }
+
+app.whenReady().then(() => {
+  ipcMain.handle(
+    'SET_PIN_WINDOW_SIZE',
+    (_e, id: number, width: number, height: number) => {
+      setPinWindowSize(id, width, height)
+    }
+  )
+})

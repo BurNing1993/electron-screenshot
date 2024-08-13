@@ -9,7 +9,7 @@ import {
   create as createMainWindow,
   focus as focusMainWindow,
 } from './windows/main'
-import handleIPC from './ipc'
+import './ipc'
 import './menu'
 import { beforeScreenshotQuit } from './windows/screenshot'
 import { beforeRecorderQuit } from './windows/recorder'
@@ -29,7 +29,6 @@ if (!gotTheLock) {
   })
   app.whenReady().then(() => {
     createMainWindow()
-    handleIPC()
   })
 }
 

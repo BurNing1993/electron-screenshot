@@ -14,8 +14,12 @@ interface ScreenshotConfig {
 
 const LOCAL_KEY = 'screenshot_config'
 
-const Screenshot: React.FC = () => {
-  const [show, setShow] = useState(false)
+interface Props {
+  show: boolean
+  toggleShow: () => void
+}
+
+const Screenshot: React.FC<Props> = ({ show, toggleShow }) => {
   const [config, setConfig] = useState<ScreenshotConfig>({
     clipboard: true,
     pin: false,
@@ -45,6 +49,7 @@ const Screenshot: React.FC = () => {
   }, [])
 
   useEffect(() => {
+    window.electronAPI.updateScreenshotConfig(config)
     localStorage.setItem(LOCAL_KEY, JSON.stringify(config))
   }, [config])
 
@@ -61,7 +66,7 @@ const Screenshot: React.FC = () => {
         <Button
           size="icon"
           variant={show ? 'default' : 'secondary'}
-          onClick={() => setShow((s) => !s)}
+          onClick={toggleShow}
         >
           <Settings2 />
         </Button>
@@ -85,7 +90,7 @@ const Screenshot: React.FC = () => {
           />
         </div>
         <div className="flex items-center space-x-2">
-          <Label className="flex-shrink-0" htmlFor="pin">
+          <Label className="flex-shrink-0 w-20" htmlFor="pin">
             钉到桌面
           </Label>
           <Switch
@@ -97,7 +102,7 @@ const Screenshot: React.FC = () => {
           />
         </div>
         <div className="flex items-center space-x-2">
-          <Label className="flex-shrink-0" htmlFor="save">
+          <Label className="flex-shrink-0 w-20" htmlFor="save">
             保存截图
           </Label>
           <Switch
@@ -109,7 +114,7 @@ const Screenshot: React.FC = () => {
           />
         </div>
         <div className="flex items-center space-x-2">
-          <Label className="flex-shrink-0">保存路径</Label>
+          <Label className="flex-shrink-0 w-20">保存路径</Label>
           <Input
             value={config.savePath}
             readOnly

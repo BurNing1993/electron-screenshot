@@ -8,7 +8,7 @@ let quit = false
 export function create() {
   win = new BrowserWindow({
     width: 400,
-    height: 800,
+    height: 310,
     show: false,
     titleBarStyle: 'hidden',
     maximizable: false,

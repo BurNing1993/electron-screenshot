@@ -31,6 +31,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('START_RECORD', config),
   stopRecorder: () => ipcRenderer.invoke('STOP_RECORD'),
   getPath: (name: AppPathName) => ipcRenderer.invoke('GET_PATH', name),
+  updateRecorderConfig: (config: RecorderConfig) =>
+    ipcRenderer.invoke('UPDATE_RECORDER_CONFIG', config),
+  updateScreenshotConfig: (config: ScreenshotConfig) =>
+    ipcRenderer.invoke('UPDATE_SCREENSHOT_CONFIG', config),
 })
 
 function addListener(channel: string, callback: (...args: any[]) => void) {
