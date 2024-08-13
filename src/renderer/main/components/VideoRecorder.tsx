@@ -66,7 +66,7 @@ const VideoRecorder: React.FC<Props> = ({ show, toggleShow }) => {
     <>
       <div className="flex items-center gap-1">
         <Button className="flex-1" onClick={startRecord}>
-          {status === 'stop' ? '开始' : '停止'}录屏
+          {status === 'stop' ? '开始' : '停止'}录屏(<kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>S</kbd>)
         </Button>
         <Button
           size="icon"

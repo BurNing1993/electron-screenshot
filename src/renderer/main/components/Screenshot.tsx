@@ -61,7 +61,7 @@ const Screenshot: React.FC<Props> = ({ show, toggleShow }) => {
     <>
       <div className="flex items-center gap-1">
         <Button className="flex-1" onClick={onScreenshot}>
-          截图
+          截图(<kbd>Shift</kbd> + <kbd>Alt</kbd> + <kbd>A</kbd>)
         </Button>
         <Button
           size="icon"

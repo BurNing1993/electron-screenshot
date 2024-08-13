@@ -16,7 +16,7 @@ module.exports = {
   },
   files: ['dist'],
   win: {
-    icon: 'resources/icon.ico',
+    icon: 'resources/icon.ico', // 256 * 256
     target: 'nsis',
   },
   nsis: {

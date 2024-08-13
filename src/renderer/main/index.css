@@ -1,0 +1,14 @@
+kbd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    Liberation Mono, Vazirmatn, Courier New, monospace;
+  font-feature-settings: normal;
+  font-variation-settings: normal;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  border-width: 1px;
+  border-bottom-width: 2px;
+  padding: 1px 4px;
+  margin: 0 1px;
+}

@@ -4,7 +4,7 @@ import Screenshot from './components/Screenshot'
 import VideoRecorder from './components/VideoRecorder'
 
 const App: React.FC = () => {
-  const [screenshotShow, setScreenshotShow] = useState(false)
+  const [screenshotShow, setScreenshotShow] = useState(true)
   const [videoShow, setVideoShow] = useState(false)
   return (
     <>

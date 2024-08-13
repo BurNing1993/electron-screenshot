@@ -4,6 +4,7 @@ import {
   app,
   BrowserWindow,
   desktopCapturer,
+  globalShortcut,
   ipcMain,
   screen,
 } from 'electron/main'
@@ -13,6 +14,7 @@ import { hideMainWidow } from './main'
 import { createPinWindow } from './pin'
 import { clipboard, nativeImage } from 'electron/common'
 import { dateFileName } from '../utils'
+import log from 'electron-log/main'
 
 let win: BrowserWindow = null!
 let quit = false
@@ -107,8 +109,17 @@ export function beforeScreenshotQuit() {
   quit = true
 }
 
+function registerScreenshotShortcut() {
+  const ret = globalShortcut.register('Shift+Alt+A', takeScreenshot)
+  if (!ret) {
+    log.error('registration failed')
+  }
+}
+
 // IPC
 app.whenReady().then(() => {
+  registerScreenshotShortcut()
+
   ipcMain.handle('UPDATE_SCREENSHOT_CONFIG', (_e, config: ScreenshotConfig) => {
     screenshotConfig = config
   })

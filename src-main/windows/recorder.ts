@@ -8,14 +8,16 @@ import {
   screen,
   session,
   Notification,
+  globalShortcut,
 } from 'electron/main'
 import { ROOT } from '../constant'
-import type { RecorderConfig } from '../types'
+import type { RecorderConfig, RecorderStatus } from '../types'
 import { setNormalTray, setStopRecordTray } from '../menu'
 import { dateFileName } from '../utils'
 import { shell } from 'electron/common'
 import { sendToMain } from './main'
 import { successIcon } from '../icons'
+import log from 'electron-log/main'
 
 let win: BrowserWindow = null!
 let quit = false
@@ -26,6 +28,7 @@ let recorderConfig: RecorderConfig = {
   ext: 'mp4',
 }
 let notification: Notification = null!
+let status: RecorderStatus = 'stop'
 
 export function createRecorderWindow() {
   const { width, height } = screen.getPrimaryDisplay().workAreaSize
@@ -114,10 +117,25 @@ export function stopRecorder() {
   win.webContents.send('ON_STOP_RECORDER')
 }
 
+function registerRecorderShortcut() {
+  const ret = globalShortcut.register('Shift+Alt+S', () => {
+    if (status === 'stop') {
+      startRecorder()
+    } else {
+      stopRecorder()
+    }
+  })
+  if (!ret) {
+    log.error('registration failed')
+  }
+}
+
 /**
  * IPC
  */
 app.whenReady().then(() => {
+  registerRecorderShortcut()
+
   ipcMain.handle('UPDATE_RECORDER_CONFIG', (_e, config: RecorderConfig) => {
     recorderConfig = config
   })
@@ -149,11 +167,13 @@ app.whenReady().then(() => {
       })
       .finally(() => {
         sendToMain('RECORDER_STATUS_CHANGE', 'stop')
+        status = 'stop'
       })
   })
 
   ipcMain.handle('RECORDER_STARTED', () => {
     sendToMain('RECORDER_STATUS_CHANGE', 'start')
+    status = 'start'
     setStopRecordTray()
   })
 })
