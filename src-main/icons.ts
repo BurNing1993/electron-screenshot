@@ -1,6 +1,6 @@
 import { nativeImage } from 'electron'
 import winIconImg from './assets/icon32.png'
-import appImg from './assets/app.png'
+import appImg from './assets/icon16.png'
 import appleIconImg from './assets/appleIcon.png'
 import logoutImg from './assets/logout.png'
 import iconImg from './assets/icon192.png'
