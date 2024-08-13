@@ -39,6 +39,9 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: path.join(ROOT, 'src/renderer/index.html'),
+        pin: path.join(ROOT, 'src/renderer/pin.html'),
+        recorder: path.join(ROOT, 'src/renderer/recorder.html'),
+        screenshot: path.join(ROOT, 'src/renderer/screenshot.html'),
       },
     },
   },
