@@ -13,21 +13,23 @@ import { focus } from './windows/main'
 import { version } from '../package.json'
 import { startRecorder, stopRecorder } from './windows/recorder'
 import { takeScreenshot } from './windows/screenshot'
+import { checkForUpdates } from './updater'
 
 function about() {
-  dialog.showMessageBox({
-    icon: icon,
-    type: 'info',
-    title: APP_NAME,
-    message: APP_NAME,
-    detail: `版本: v${version}node: ${process.versions.node}\nchrome: ${process.versions.chrome}\nelectron: ${process.versions.electron}\nplatform: ${process.platform}\nv8: ${process.versions.v8}\n`,
-    // buttons: ['检查更新', '关闭'],
-  })
-  // .then((res) => {
-  //   if (res.response === 0) {
-  //     checkForUpdates('hint')
-  //   }
-  // })
+  dialog
+    .showMessageBox({
+      icon: icon,
+      type: 'info',
+      title: APP_NAME,
+      message: APP_NAME,
+      detail: `版本: v${version}\nnode: ${process.versions.node}\nchrome: ${process.versions.chrome}\nelectron: ${process.versions.electron}\nplatform: ${process.platform}\nv8: ${process.versions.v8}\n`,
+      buttons: ['检查更新', '关闭'],
+    })
+    .then((res) => {
+      if (res.response === 0) {
+        checkForUpdates('hint')
+      }
+    })
 }
 
 if (process.platform === 'darwin') {
@@ -115,14 +117,30 @@ app.whenReady().then(() => {
   tray.on('click', focus)
 })
 
-export function setStopRecordTray() {
+export function setStopRecorderTray() {
   tray.setImage(appStopIcon)
-  tray.once('click', () => {
-    stopRecorder()
-    tray.setImage(appIcon)
-  })
+  tray.off('click', focus)
+  tray.setContextMenu(null)
+  tray.once('click', stopRecorder)
 }
 
 export function setNormalTray() {
   tray.setImage(appIcon)
+  tray.off('click', stopRecorder)
+  tray.on('click', focus)
+  const contextMenu = Menu.buildFromTemplate([
+    { id: 'app', label: APP_NAME, icon: trayAppIcon, click: focus },
+    {
+      id: 'screenshot',
+      label: '截图',
+      icon: trayAppIcon,
+      click: takeScreenshot,
+    },
+    { id: 'record', label: '录屏', icon: recorderIcon, click: startRecorder },
+    { type: 'separator' },
+    { id: 'about', label: '关于', icon: aboutIcon, click: about },
+    { type: 'separator' },
+    { label: '退出', icon: logoutIcon, role: 'quit' },
+  ])
+  tray.setContextMenu(contextMenu)
 }

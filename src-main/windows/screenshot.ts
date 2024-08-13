@@ -48,8 +48,7 @@ export function createScreenshotWindow() {
   })
 
   win.once('ready-to-show', () => {
-    takeScreenshot()
-    if (import.meta.env.DEV || process.argv.includes('--dev')) {
+    if (process.argv.includes('--dev')) {
       win.webContents.openDevTools({ mode: 'bottom' })
     }
   })
@@ -70,13 +69,11 @@ export function createScreenshotWindow() {
 
 export function takeScreenshot() {
   hideMainWidow()
-  if (win === null) {
-    createScreenshotWindow()
-    return
-  } else {
-    win.show()
-  }
-  const { width, height } = win.getBounds()
+  const cursor = screen.getCursorScreenPoint()
+  const currentDisplay = screen.getDisplayNearestPoint(cursor)
+  const { width, height } = currentDisplay.workAreaSize
+  win.setSize(width, height)
+  win.show()
   desktopCapturer
     .getSources({
       types: ['screen'],
@@ -118,6 +115,8 @@ function registerScreenshotShortcut() {
 
 // IPC
 app.whenReady().then(() => {
+  process.nextTick(createScreenshotWindow)
+
   registerScreenshotShortcut()
 
   ipcMain.handle('UPDATE_SCREENSHOT_CONFIG', (_e, config: ScreenshotConfig) => {

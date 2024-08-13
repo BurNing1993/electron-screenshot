@@ -37,7 +37,7 @@ export function createPinWindow(url: string) {
   win.once('ready-to-show', () => {
     win.webContents.send('ON_PIN', url, id)
     win.show()
-    if (import.meta.env.DEV || process.argv.includes('--dev')) {
+    if (process.argv.includes('--dev')) {
       win.webContents.openDevTools({ mode: 'bottom' })
     }
   })

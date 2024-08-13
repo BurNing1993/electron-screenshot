@@ -24,7 +24,7 @@ export function create() {
   })
   win.once('ready-to-show', () => {
     win.show()
-    if (import.meta.env.DEV || process.argv.includes('--dev')) {
+    if (process.argv.includes('--dev')) {
       win.webContents.openDevTools({ mode: 'bottom' })
     }
   })

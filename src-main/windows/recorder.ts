@@ -12,10 +12,10 @@ import {
 } from 'electron/main'
 import { ROOT } from '../constant'
 import type { RecorderConfig, RecorderStatus } from '../types'
-import { setNormalTray, setStopRecordTray } from '../menu'
+import { setNormalTray, setStopRecorderTray } from '../menu'
 import { dateFileName } from '../utils'
 import { shell } from 'electron/common'
-import { sendToMain } from './main'
+import { hideMainWidow, sendToMain } from './main'
 import { successIcon } from '../icons'
 import log from 'electron-log/main'
 
@@ -44,8 +44,7 @@ export function createRecorderWindow() {
   })
 
   win.once('ready-to-show', () => {
-    startRecorder()
-    if (import.meta.env.DEV || process.argv.includes('--dev')) {
+    if (process.argv.includes('--dev')) {
       win.webContents.openDevTools({ mode: 'bottom' })
     }
   })
@@ -65,14 +64,8 @@ export function createRecorderWindow() {
 }
 
 export function startRecorder() {
-  if (win === null) {
-    createRecorderWindow()
-    return
-  }
-  if (import.meta.env.DEV) {
-    win.show()
-  }
-  desktopCapturer
+  hideMainWidow()
+  return desktopCapturer
     .getSources({
       types: ['screen'],
     })
@@ -134,6 +127,8 @@ function registerRecorderShortcut() {
  * IPC
  */
 app.whenReady().then(() => {
+  process.nextTick(createRecorderWindow)
+
   registerRecorderShortcut()
 
   ipcMain.handle('UPDATE_RECORDER_CONFIG', (_e, config: RecorderConfig) => {
@@ -145,7 +140,6 @@ app.whenReady().then(() => {
   ipcMain.handle('STOP_RECORD', stopRecorder)
 
   ipcMain.handle('SAVE_VIDEO', (_e, arrayBuffer: ArrayBuffer) => {
-    console.log('SAVE_VIDEO')
     setNormalTray()
     const buffer = Buffer.from(arrayBuffer)
     const videoPath = path.join(
@@ -167,13 +161,15 @@ app.whenReady().then(() => {
       })
       .finally(() => {
         sendToMain('RECORDER_STATUS_CHANGE', 'stop')
+        console.log('RECORDER_STOP')
         status = 'stop'
       })
   })
 
   ipcMain.handle('RECORDER_STARTED', () => {
+    console.log('RECORDER_STARTED')
     sendToMain('RECORDER_STATUS_CHANGE', 'start')
     status = 'start'
-    setStopRecordTray()
+    setStopRecorderTray()
   })
 })
